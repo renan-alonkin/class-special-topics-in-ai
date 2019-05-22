@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+            Lets Predict
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+
+<body>
+    <div class="container col-4">
+        <h3>
+            Classifique sua revisão como Positiva ou Negativa.
+        </h3>
+        <form>
+            <div class="form-group">
+              <label for="review">Escreva sua revisão (em inglês):</label>
+                <textarea class="form-control" rows="5" id="review" placeholder="Example: This film was amazing!"></textarea>
+            </div>
+            <button type="button" class="btn btn-success" id="enviar">
+                Enviar
+            </button>
+        </form>
+        <div class="text-light mt-4 text-center p-1">
+            <p id="result"></p>
+        </div>
+    </div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script>
+    function mostrarResultado(resultado){
+        switch(resultado){
+            case 1:
+                $('#result').attr('class','bg-success');
+                $('#result').html('O seu review foi POSITIVO');
+                break;
+            case -1:
+                $('#result').attr('class','bg-danger');
+                $('#result').html('O seu review foi NEGATIVO');
+                break;
+            case 0:
+                $('#result').attr('class','bg-dark');
+                $('#result').html('Por gentileza. Detalhes mais a sua revisão!');
+                break;
+        }
+    }
+</script>
+
+
+<script>
+    $('#enviar').click(function(){
+        var review = $('#review').val();
+
+        if(!review){
+            return alert('A revisão está vazia. Escreva uma revisão de filme')
+        }
+        
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState === 4 && xhr.status === 200){
+                mostrarResultado(parseInt(xhr.responseText))
+            }
+        }
+
+        xhr.onerror = function(){
+            return alert('Erro ao conectar com o serviço de predição.');
+        }
+
+        xhr.open("POST","http://localhost:5000/sentiment_analysis");
+
+        var jsonObject = JSON.stringify({'text': review});
+        xhr.send(jsonObject);
+    });
+
+</script>
+
+<!-- 
+<script>
+    $("#enviar").click(function(){
+        var txt = $("#review").val();
+        txt = JSON.stringify({'text': review});
+        console.log(txt);
+        $.post("http://localhost:5000/sentiment_analysis", 
+        txt,
+        function(result){
+            console.log(result);
+            $("#result").html(result);
+        });
+    });
+</script> -->
+
+
+</html>
